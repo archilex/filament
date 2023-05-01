@@ -63,6 +63,10 @@ trait HasActions
         } catch (Cancel $exception) {
         }
 
+        if (filled($this->redirectTo)) {
+            return $result;
+        }
+
         $this->mountedAction = null;
 
         $action->resetArguments();
@@ -125,7 +129,7 @@ trait HasActions
         ]);
     }
 
-    protected function getCachedActions(): array
+    public function getCachedActions(): array
     {
         if ($this->cachedActions === null) {
             $this->cacheActions();

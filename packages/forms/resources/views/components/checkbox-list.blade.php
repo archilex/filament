@@ -1,3 +1,7 @@
+@php
+    $gridDirection = $getGridDirection();
+@endphp
+
 <x-dynamic-component
     :component="$getFieldWrapperView()"
     :id="$getId()"
@@ -23,13 +27,13 @@
         visibleCheckboxListOptions: [],
 
         init: function () {
+            this.updateVisibleCheckboxListOptions()
+
             this.checkIfAllCheckboxesAreChecked()
 
             Livewire.hook('message.processed', () => {
                 this.checkIfAllCheckboxesAreChecked()
             })
-
-            this.updateVisibleCheckboxListOptions()
 
             $watch('search', () => {
                 this.updateVisibleCheckboxListOptions()
@@ -68,7 +72,7 @@
                     type="search"
                     placeholder="{{ $getSearchPrompt() }}"
                     @class([
-                        'mb-2 block h-7 px-2 text-sm w-full rounded-lg border-gray-300 shadow-sm text-gray-700 transition duration-75 focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500',
+                        'mb-2 block h-7 px-2 text-sm w-full rounded-lg border-gray-300 shadow-sm text-gray-700 transition duration-75 outline-none focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500',
                         'dark:text-gray-200 dark:bg-gray-700 dark:border-gray-600' => config('forms.dark_mode'),
                     ])
                 />
@@ -110,9 +114,12 @@
             :lg="$getColumns('lg')"
             :xl="$getColumns('xl')"
             :two-xl="$getColumns('2xl')"
-            direction="column"
+            :direction="$gridDirection ?? 'column'"
             :x-show="$isSearchable() ? 'visibleCheckboxListOptions.length' : null"
-            :attributes="$attributes->class(['filament-forms-checkbox-list-component gap-1 space-y-2'])"
+            :attributes="\Filament\Support\prepare_inherited_attributes($attributes->class([
+                'filament-forms-checkbox-list-component gap-1',
+                'space-y-2' => $gridDirection !== 'row',
+            ]))"
         >
             @forelse ($getOptions() as $optionValue => $optionLabel)
                 <div wire:key="{{ $this->id }}.{{ $getStatePath() }}.{{ $field::class }}.options.{{ $optionValue }}">

@@ -1,5 +1,7 @@
 @props([
     'darkMode' => false,
+    'maxHeight' => null,
+    'offset' => 8,
     'placement' => null,
     'shift' => false,
     'teleport' => false,
@@ -30,7 +32,7 @@
 
     <div
         x-ref="panel"
-        x-float{{ $placement ? ".placement.{$placement}" : '' }}.flip.offset{{ $shift ? '.shift' : '' }}{{ $teleport ? '.teleport' : '' }}="{ offset: 8 }"
+        x-float{{ $placement ? ".placement.{$placement}" : '' }}.flip{{ $shift ? '.shift' : '' }}{{ $teleport ? '.teleport' : '' }}{{ $offset ? '.offset' : '' }}="{ offset: {{ $offset }} }"
         x-cloak
         x-transition:enter-start="opacity-0 scale-95"
         x-transition:leave-end="opacity-0 scale-95"
@@ -38,8 +40,11 @@
             wire:ignore.self
             wire:key="{{ $attributes->get('wire:key') }}.panel"
         @endif
+        @if ($maxHeight)
+            style="max-height: {{ $maxHeight }}"
+        @endif
         @class([
-            'filament-dropdown-panel absolute z-10 w-full divide-y divide-gray-100 rounded-lg bg-white shadow-lg ring-1 ring-black/5 transition',
+            'filament-dropdown-panel absolute z-10 w-full divide-y divide-gray-100 overflow-y-auto rounded-lg bg-white shadow-lg ring-1 ring-black/5 transition',
             'dark:divide-gray-700 dark:bg-gray-800 dark:ring-white/10' => $darkMode,
             match ($width) {
                 'xs' => 'max-w-xs',

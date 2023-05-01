@@ -68,7 +68,9 @@ trait HasFilters
             );
         }
 
-        $this->deselectAllTableRecords();
+        if ($this->shouldDeselectAllRecordsWhenTableFiltered()) {
+            $this->deselectAllTableRecords();
+        }
 
         $this->resetPage();
     }
@@ -172,6 +174,11 @@ trait HasFilters
             ],
             default => 1,
         };
+    }
+
+    protected function getTableFiltersFormMaxHeight(): ?string
+    {
+        return null;
     }
 
     protected function getTableFiltersFormSchema(): array

@@ -168,7 +168,7 @@ Fieldset::make('Metadata')
     ])
 ```
 
-In this example, the `title`, `description` and `image` is automatically loaded from saved to the `metadata` relationship, and saved again when the form is submitted. If the `metadata` record does not exist, it is automatically created.
+In this example, the `title`, `description` and `image` are automatically loaded from the `metadata` relationship, and saved again when the form is submitted. If the `metadata` record does not exist, it is automatically created.
 
 > To set this functionality up, **you must also follow the instructions set out in the [field relationships](getting-started#field-relationships) section**. If you're using the [admin panel](/docs/admin), you can skip this step.
 
@@ -482,6 +482,8 @@ Section::make('Heading')
 
 Placeholders can be used to render text-only "fields" within your forms. Each placeholder has `content()`, which cannot be changed by the user.
 
+> **Important:** All fields require a unique name. That also applies to Placeholders!
+
 ```php
 use Filament\Forms\Components\Placeholder;
 
@@ -522,6 +524,20 @@ Card::make()
         // ...
     ])
     ->columns(2)
+```
+
+## Inline labels
+
+You may use the `inlineLabel()` method to make the form labels and fields in separate columns, inline with each other. It works on all layout components, each field inside will have an inline label.
+
+```php
+use Filament\Forms\Components\Card;
+
+Card::make()
+    ->schema([
+        // ...
+    ])
+    ->inlineLabel()
 ```
 
 ## View

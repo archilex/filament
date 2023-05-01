@@ -24,6 +24,8 @@ class Builder extends Field implements Contracts\CanConcealComponents
 
     protected bool | Closure $isItemMovementDisabled = false;
 
+    protected bool | Closure $isReorderableWithButtons = false;
+
     protected bool | Closure $isItemCreationDisabled = false;
 
     protected bool | Closure $isItemDeletionDisabled = false;
@@ -189,7 +191,7 @@ class Builder extends Field implements Contracts\CanConcealComponents
         });
     }
 
-    public function blocks(array $blocks): static
+    public function blocks(array | Closure $blocks): static
     {
         $this->childComponents($blocks);
 
@@ -234,6 +236,13 @@ class Builder extends Field implements Contracts\CanConcealComponents
     public function inset(bool | Closure $condition = true): static
     {
         $this->isInset = $condition;
+
+        return $this;
+    }
+
+    public function reorderableWithButtons(bool | Closure $condition = true): static
+    {
+        $this->isReorderableWithButtons = $condition;
 
         return $this;
     }
@@ -283,9 +292,9 @@ class Builder extends Field implements Contracts\CanConcealComponents
                 fn (array $itemData, $itemIndex): ComponentContainer => $this
                     ->getBlock($itemData['type'])
                     ->getChildComponentContainer()
-                    ->getClone()
                     ->statePath("{$itemIndex}.data")
-                    ->inlineLabel(false),
+                    ->inlineLabel(false)
+                    ->getClone(),
             )
             ->all();
     }
@@ -303,6 +312,11 @@ class Builder extends Field implements Contracts\CanConcealComponents
     public function hasBlock($name): bool
     {
         return (bool) $this->getBlock($name);
+    }
+
+    public function isReorderableWithButtons(): bool
+    {
+        return $this->evaluate($this->isReorderableWithButtons) && (! $this->isItemMovementDisabled());
     }
 
     public function isItemMovementDisabled(): bool

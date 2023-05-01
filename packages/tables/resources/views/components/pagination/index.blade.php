@@ -62,13 +62,15 @@
                     'pl-2 text-sm font-medium',
                     'dark:text-white' => config('tables.dark_mode'),
                 ])>
-                    @if ($paginator->total() > 1)
-                        {{ __('tables::table.pagination.overview', [
+                    {{ trans_choice(
+                        'tables::table.pagination.overview',
+                        $paginator->total(),
+                        [
                             'first' => $paginator->firstItem(),
                             'last' => $paginator->lastItem(),
                             'total' => $paginator->total(),
-                        ]) }}
-                    @endif
+                        ],
+                    ) }}
                 </div>
             @endif
         </div>
@@ -122,7 +124,7 @@
                                         <x-tables::pagination.item
                                             :wire:click="'gotoPage(' . $page . ', \'' . $paginator->getPageName() . '\')'"
                                             :label="$page"
-                                            :aria-label="__('tables::table.pagination.buttons.go_to_page.label', ['page' => $page])"
+                                            :aria-label="trans_choice('tables::table.pagination.buttons.go_to_page.label', $page, ['page' => $page])"
                                             :active="$page === $paginator->currentPage()"
                                             :wire:key="$this->id . '.table.pagination.' . $paginator->getPageName() . '.' . $page"
                                         />

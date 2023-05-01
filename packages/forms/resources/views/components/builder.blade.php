@@ -15,6 +15,7 @@
         $containers = $getChildComponentContainers();
 
         $isCloneable = $isCloneable();
+        $isReorderableWithButtons = $isReorderableWithButtons();
         $isCollapsible = $isCollapsible();
         $isItemCreationDisabled = $isItemCreationDisabled();
         $isItemDeletionDisabled = $isItemDeletionDisabled();
@@ -66,7 +67,7 @@
                     <li
                         x-data="{
                             isCreateButtonVisible: false,
-                            isCollapsed: @js($isCollapsed()),
+                            isCollapsed: @js($isCollapsed($item)),
                         }"
                         x-on:builder-collapse.window="$event.detail === '{{ $getStatePath() }}' && (isCollapsed = true)"
                         x-on:builder-expand.window="$event.detail === '{{ $getStatePath() }}' && (isCollapsed = false)"
@@ -74,7 +75,7 @@
                         x-on:mouseenter="isCreateButtonVisible = true"
                         x-on:click.away="isCreateButtonVisible = false"
                         x-on:mouseleave="isCreateButtonVisible = false"
-                        wire:key="{{ $this->id }}.{{ $item->getStatePath() }}.item"
+                        wire:key="{{ $this->id }}.{{ $item->getStatePath() }}.{{ $field::class }}.item"
                         wire:sortable.item="{{ $uuid }}"
                         x-on:expand-concealing-component.window="
                             error = $el.querySelector('[data-validation-error]')
@@ -92,7 +93,7 @@
                             setTimeout(() => $el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' }), 200)
                         "
                         @class([
-                            'bg-white border border-gray-300 shadow-sm rounded-xl relative',
+                            'filament-forms-builder-component-item bg-white border border-gray-300 shadow-sm rounded-xl relative',
                             'dark:bg-gray-800 dark:border-gray-600' => config('forms.dark_mode'),
                         ])
                     >
@@ -155,11 +156,81 @@
                                     'flex divide-x rtl:divide-x-reverse',
                                     'dark:divide-gray-700' => config('forms.dark_mode'),
                                 ])>
+                                    @if ($isReorderableWithButtons)
+                                        @unless ($loop->first)
+                                            <li>
+                                                <button
+                                                    title="{{ __('forms::components.builder.buttons.move_item_up.label') }}"
+                                                    type="button"
+                                                    wire:click.stop="dispatchFormEvent('builder::moveItemUp', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                    wire:target="dispatchFormEvent('builder::moveItemUp', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                    wire:loading.attr="disabled"
+                                                    @class([
+                                                        'flex items-center justify-center flex-none w-10 h-10 text-gray-400 transition hover:text-gray-500',
+                                                        'dark:border-gray-700' => config('forms.dark_mode'),
+                                                    ])
+                                                >
+                                                    <span class="sr-only">
+                                                        {{ __('forms::components.builder.buttons.move_item_up.label') }}
+                                                    </span>
+
+                                                    <x-heroicon-s-chevron-up
+                                                        class="w-4 h-4"
+                                                        wire:loading.remove.delay
+                                                        wire:target="dispatchFormEvent('builder::moveItemUp', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                    />
+
+                                                    <x-filament-support::loading-indicator
+                                                        class="w-4 h-4 text-primary-500"
+                                                        wire:loading.delay
+                                                        wire:target="dispatchFormEvent('builder::moveItemUp', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                        x-cloak
+                                                    />
+                                                </button>
+                                            </li>
+                                        @endunless
+
+                                        @unless ($loop->last)
+                                            <li>
+                                                <button
+                                                    title="{{ __('forms::components.builder.buttons.move_item_down.label') }}"
+                                                    type="button"
+                                                    wire:click.stop="dispatchFormEvent('builder::moveItemDown', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                    wire:target="dispatchFormEvent('builder::moveItemDown', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                    wire:loading.attr="disabled"
+                                                    @class([
+                                                        'flex items-center justify-center flex-none w-10 h-10 text-gray-400 transition hover:text-gray-500',
+                                                        'dark:border-gray-700' => config('forms.dark_mode'),
+                                                    ])
+                                                >
+                                                    <span class="sr-only">
+                                                        {{ __('forms::components.builder.buttons.move_item_down.label') }}
+                                                    </span>
+
+                                                    <x-heroicon-s-chevron-down
+                                                        class="w-4 h-4"
+                                                        wire:loading.remove.delay
+                                                        wire:target="dispatchFormEvent('builder::moveItemDown', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                    />
+
+                                                    <x-filament-support::loading-indicator
+                                                        class="w-4 h-4 text-primary-500"
+                                                        wire:loading.delay
+                                                        wire:target="dispatchFormEvent('builder::moveItemDown', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                        x-cloak
+                                                    />
+                                                </button>
+                                            </li>
+                                        @endunless
+                                    @endif
+
                                     @if ($isCloneable)
                                         <li>
                                             <button
                                                 title="{{ __('forms::components.builder.buttons.clone_item.label') }}"
                                                 wire:click.stop="dispatchFormEvent('builder::cloneItem', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                wire:target="dispatchFormEvent('builder::cloneItem', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                wire:loading.attr="disabled"
                                                 type="button"
                                                 @class([
                                                     'flex items-center justify-center flex-none w-10 h-10 text-gray-400 transition hover:text-gray-500',
@@ -170,7 +241,18 @@
                                                     {{ __('forms::components.builder.buttons.clone_item.label') }}
                                                 </span>
 
-                                                <x-heroicon-s-duplicate class="w-4 h-4"/>
+                                                <x-heroicon-s-duplicate
+                                                    class="w-4 h-4"
+                                                    wire:loading.remove.delay
+                                                    wire:target="dispatchFormEvent('builder::cloneItem', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                />
+
+                                                <x-filament-support::loading-indicator
+                                                    class="w-4 h-4 text-primary-500"
+                                                    wire:loading.delay
+                                                    wire:target="dispatchFormEvent('builder::cloneItem', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                    x-cloak
+                                                />
                                             </button>
                                         </li>
                                     @endif
@@ -180,6 +262,8 @@
                                             <button
                                                 title="{{ __('forms::components.builder.buttons.delete_item.label') }}"
                                                 wire:click.stop="dispatchFormEvent('builder::deleteItem', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                wire:target="dispatchFormEvent('builder::deleteItem', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                wire:loading.attr="disabled"
                                                 type="button"
                                                 @class([
                                                     'flex items-center justify-center flex-none w-10 h-10 text-danger-600 transition hover:text-danger-500',
@@ -190,7 +274,18 @@
                                                     {{ __('forms::components.builder.buttons.delete_item.label') }}
                                                 </span>
 
-                                                <x-heroicon-s-trash class="w-4 h-4"/>
+                                                <x-heroicon-s-trash
+                                                    class="w-4 h-4"
+                                                    wire:loading.remove.delay
+                                                    wire:target="dispatchFormEvent('builder::deleteItem', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                />
+
+                                                <x-filament-support::loading-indicator
+                                                    class="w-4 h-4 text-primary-500"
+                                                    wire:loading.delay
+                                                    wire:target="dispatchFormEvent('builder::deleteItem', '{{ $getStatePath() }}', '{{ $uuid }}')"
+                                                    x-cloak
+                                                />
                                             </button>
                                         </li>
                                     @endunless
@@ -261,7 +356,7 @@
                 class="flex justify-center"
             >
                 <x-slot name="trigger">
-                    <x-forms::button size="sm">
+                    <x-forms::button size="sm" outlined>
                         {{ $getCreateItemButtonLabel() }}
                     </x-forms::button>
                 </x-slot>

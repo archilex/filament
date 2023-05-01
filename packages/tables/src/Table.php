@@ -198,6 +198,14 @@ class Table extends ViewComponent
         return $this->getLivewire()->getTableFiltersForm();
     }
 
+    public function getFiltersFormMaxHeight(): ?string
+    {
+        /** @var TableComponent $livewire */
+        $livewire = $this->getLivewire();
+
+        return invade($livewire)->getTableFiltersFormMaxHeight();
+    }
+
     public function getFiltersFormWidth(): ?string
     {
         /** @var TableComponent $livewire */
@@ -217,6 +225,14 @@ class Table extends ViewComponent
     public function getColumnToggleForm(): ComponentContainer
     {
         return $this->getLivewire()->getTableColumnToggleForm();
+    }
+
+    public function getColumnToggleFormMaxHeight(): ?string
+    {
+        /** @var TableComponent $livewire */
+        $livewire = $this->getLivewire();
+
+        return invade($livewire)->getTableColumnToggleFormMaxHeight();
     }
 
     public function getColumnToggleFormWidth(): ?string
@@ -441,5 +457,15 @@ class Table extends ViewComponent
         $livewire = $this->getLivewire();
 
         return invade($livewire)->isTableStriped();
+    }
+
+    public function isLoaded(): bool
+    {
+        return $this->getLivewire()->isTableLoaded();
+    }
+
+    public function hasColumnSearches(): bool
+    {
+        return $this->getLivewire()->hasTableColumnSearches();
     }
 }

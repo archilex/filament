@@ -21,6 +21,9 @@ class PostsTable extends Component implements Tables\Contracts\HasTable
                 ->sortable()
                 ->searchable()
                 ->action(fn () => $this->emit('title-action-called')),
+            Tables\Columns\TextColumn::make('content')
+                ->words(10)
+                ->searchable(isIndividual: true, isGlobal: false),
             Tables\Columns\TextColumn::make('author.name')
                 ->sortable()
                 ->searchable()
@@ -28,6 +31,8 @@ class PostsTable extends Component implements Tables\Contracts\HasTable
                     Tables\Actions\Action::make('column-action-object')
                         ->action(fn () => $this->emit('column-action-object-called')),
                 ),
+            Tables\Columns\TextColumn::make('author.email')
+                ->searchable(isIndividual: true, isGlobal: false),
             Tables\Columns\IconColumn::make('is_published')->boolean(),
             Tables\Columns\TextColumn::make('visible'),
             Tables\Columns\TextColumn::make('hidden')
@@ -103,6 +108,7 @@ class PostsTable extends Component implements Tables\Contracts\HasTable
             Tables\Actions\Action::make('has-color')
                 ->color('primary'),
             Tables\Actions\Action::make('exists'),
+            Tables\Actions\Action::make('exists-in-order'),
             Tables\Actions\Action::make('url')
                 ->url('https://filamentphp.com'),
             Tables\Actions\Action::make('url_in_new_tab')
@@ -157,6 +163,15 @@ class PostsTable extends Component implements Tables\Contracts\HasTable
             Tables\Actions\BulkAction::make('has-color')
                 ->color('primary'),
             Tables\Actions\BulkAction::make('exists'),
+            Tables\Actions\BulkAction::make('exists_in_order'),
+        ];
+    }
+
+    protected function getTableEmptyStateActions(): array
+    {
+        return [
+            Tables\Actions\Action::make('empty-exists'),
+            Tables\Actions\Action::make('empty-exists-in-order'),
         ];
     }
 

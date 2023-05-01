@@ -1617,13 +1617,20 @@ trix-editor .attachment__metadata .attachment__size {
 trix-toolbar .filament-forms-rich-editor-component-toolbar-button.trix-active {
   @apply bg-primary-600 text-white;
 }
+[dir=rtl] trix-editor.prose :where(ul):not(:where([class~="not-prose"] *)),
+[dir=rtl] trix-editor.prose :where(ol):not(:where([class~="not-prose"] *)) {
+  padding-right: 1.625em !important;
+  padding-left: 0em !important;
+}
+[dir=rtl] trix-editor.prose :where(ul > li):not(:where([class~="not-prose"] *)),
+[dir=rtl] trix-editor.prose :where(ol > li):not(:where([class~="not-prose"] *)) {
+  padding-right: 0.375em !important;
+  padding-left: 0em !important;
+}
 
 /* packages/forms/resources/css/components/select.css */
 .choices {
-  @apply relative;
-}
-.choices:focus {
-  @apply outline-none;
+  @apply relative outline-none;
 }
 .choices:last-child {
   @apply mb-0;
@@ -1644,6 +1651,9 @@ trix-toolbar .filament-forms-rich-editor-component-toolbar-button.trix-active {
 .choices[data-type*=select-one] {
   @apply cursor-pointer;
 }
+.choices[data-type*=select-one] .has-no-choices {
+  display: none;
+}
 .choices[data-type*=select-one] .choices__input {
   @apply m-0 block w-full border-b p-2;
 }
@@ -1654,7 +1664,7 @@ trix-toolbar .filament-forms-rich-editor-component-toolbar-button.trix-active {
   @apply cursor-text;
 }
 .choices__inner {
-  @apply inline-block w-full rounded-lg border border-gray-300 bg-white bg-no-repeat py-2 px-3 align-top shadow-sm transition duration-75;
+  @apply inline-block w-full rounded-lg border border-gray-300 bg-white bg-no-repeat px-3 py-2 align-top shadow-sm transition duration-75;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
   background-position: right 0.5rem center;
   background-size: 1.5em 1.5em;
@@ -1673,7 +1683,7 @@ trix-toolbar .filament-forms-rich-editor-component-toolbar-button.trix-active {
 }
 .is-focused .choices__inner,
 .is-open .choices__inner {
-  @apply border-primary-500 ring-1 ring-inset ring-primary-500;
+  @apply border-primary-500 outline-none ring-1 ring-inset ring-primary-500;
 }
 .choices__list {
   @apply m-0 list-none pl-0;
@@ -1750,11 +1760,8 @@ trix-toolbar .filament-forms-rich-editor-component-toolbar-button.trix-active {
   @apply opacity-70;
 }
 .choices__button {
-  @apply cursor-pointer appearance-none border-0 bg-transparent bg-center bg-no-repeat;
+  @apply cursor-pointer appearance-none border-0 bg-transparent bg-center bg-no-repeat outline-none;
   text-indent: -9999px;
-}
-.choices__button:focus {
-  @apply outline-none;
 }
 .choices[data-type*=select-one] .choices__button {
   @apply absolute right-0 mr-9 h-4 w-4 p-0 opacity-60;
@@ -1810,7 +1817,7 @@ trix-toolbar .filament-forms-rich-editor-component-toolbar-button.trix-active {
   border-color: rgb(75 85 99) !important;
 }
 .choices__input {
-  @apply inline-block max-w-full border-none;
+  @apply inline-block max-w-full border-none outline-none;
   border-color: transparent !important;
   background-color: transparent !important;
   padding: 0 !important;

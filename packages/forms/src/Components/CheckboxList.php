@@ -3,6 +3,8 @@
 namespace Filament\Forms\Components;
 
 use Closure;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
@@ -10,6 +12,7 @@ use Illuminate\Support\Str;
 class CheckboxList extends Field implements Contracts\HasNestedRecursiveValidationRules
 {
     use Concerns\CanBeSearchable;
+    use Concerns\HasGridDirection;
     use Concerns\HasNestedRecursiveValidationRules;
     use Concerns\HasOptions;
 
@@ -76,6 +79,8 @@ class CheckboxList extends Field implements Contracts\HasNestedRecursiveValidati
 
         $this->loadStateFromRelationshipsUsing(static function (CheckboxList $component, ?array $state): void {
             $relationship = $component->getRelationship();
+
+            /** @var Collection $relatedModels */
             $relatedModels = $relationship->getResults();
 
             $component->state(
@@ -128,14 +133,16 @@ class CheckboxList extends Field implements Contracts\HasNestedRecursiveValidati
         return $this->evaluate($this->relationshipTitleColumnName);
     }
 
-    public function getLabel(): string
+    public function getLabel(): string | Htmlable | null
     {
         if ($this->label === null && $this->getRelationship()) {
-            return (string) Str::of($this->getRelationshipName())
+            $label = (string) Str::of($this->getRelationshipName())
                 ->before('.')
                 ->kebab()
                 ->replace(['-', '_'], ' ')
                 ->ucfirst();
+
+            return ($this->shouldTranslateLabel) ? __($label) : $label;
         }
 
         return parent::getLabel();

@@ -34,6 +34,10 @@ class TestsActions
 
             $this->call('mountTableAction', $name, $record);
 
+            if (filled($this->instance()->redirectTo)) {
+                return $this;
+            }
+
             $action = $livewire->getCachedTableAction($name) ?? $livewire->getCachedTableEmptyStateAction($name) ?? $livewire->getCachedTableHeaderAction($name);
 
             if (! $action->shouldOpenModal()) {
@@ -107,6 +111,10 @@ class TestsActions
 
             $this->call('callMountedTableAction', json_encode($arguments));
 
+            if (filled($this->instance()->redirectTo)) {
+                return $this;
+            }
+
             if ($this->get('mountedTableAction') !== $action->getName()) {
                 $this->assertDispatchedBrowserEvent('close-modal', [
                     'id' => "{$livewire->id}-table-action",
@@ -120,6 +128,8 @@ class TestsActions
     public function assertTableActionExists(): Closure
     {
         return function (string $name): static {
+            $name = $this->parseActionName($name);
+
             $livewire = $this->instance();
             $livewireClass = $livewire::class;
 
@@ -138,6 +148,8 @@ class TestsActions
     public function assertTableActionDoesNotExist(): Closure
     {
         return function (string $name): static {
+            $name = $this->parseActionName($name);
+
             $livewire = $this->instance();
             $livewireClass = $livewire::class;
 
@@ -152,9 +164,56 @@ class TestsActions
         };
     }
 
+    public function assertTableActionsExistInOrder(): Closure
+    {
+        return function (array $names): static {
+            $livewire = $this->instance();
+            $this->assertActionListInOrder(
+                $names,
+                $livewire->getCachedTableActions(),
+                'table',
+                Action::class,
+            );
+
+            return $this;
+        };
+    }
+
+    public function assertTableHeaderActionsExistInOrder(): Closure
+    {
+        return function (array $names): static {
+            $livewire = $this->instance();
+            $this->assertActionListInOrder(
+                $names,
+                $livewire->getCachedTableHeaderActions(),
+                'table header',
+                Action::class,
+            );
+
+            return $this;
+        };
+    }
+
+    public function assertTableEmptyStateActionsExistInOrder(): Closure
+    {
+        return function (array $names): static {
+            $livewire = $this->instance();
+            $this->assertActionListInOrder(
+                $names,
+                $livewire->getCachedTableEmptyStateActions(),
+                'table empty state',
+                Action::class,
+            );
+
+            return $this;
+        };
+    }
+
     public function assertTableActionVisible(): Closure
     {
         return function (string $name, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -182,6 +241,8 @@ class TestsActions
     public function assertTableActionHidden(): Closure
     {
         return function (string $name, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -209,6 +270,8 @@ class TestsActions
     public function assertTableActionEnabled(): Closure
     {
         return function (string $name, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -236,6 +299,8 @@ class TestsActions
     public function assertTableActionDisabled(): Closure
     {
         return function (string $name, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -263,6 +328,8 @@ class TestsActions
     public function assertTableActionHasIcon(): Closure
     {
         return function (string $name, string $icon, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -290,6 +357,8 @@ class TestsActions
     public function assertTableActionDoesNotHaveIcon(): Closure
     {
         return function (string $name, string $icon, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -317,6 +386,8 @@ class TestsActions
     public function assertTableActionHasLabel(): Closure
     {
         return function (string $name, string $label, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -344,6 +415,8 @@ class TestsActions
     public function assertTableActionDoesNotHaveLabel(): Closure
     {
         return function (string $name, string $label, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -371,6 +444,8 @@ class TestsActions
     public function assertTableActionHasColor(): Closure
     {
         return function (string $name, string $color, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -398,6 +473,8 @@ class TestsActions
     public function assertTableActionDoesNotHaveColor(): Closure
     {
         return function (string $name, string $color, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -425,6 +502,8 @@ class TestsActions
     public function assertTableActionHasUrl(): Closure
     {
         return function (string $name, string $url, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -452,6 +531,8 @@ class TestsActions
     public function assertTableActionDoesNotHaveUrl(): Closure
     {
         return function (string $name, string $url, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -479,6 +560,8 @@ class TestsActions
     public function assertTableActionShouldOpenUrlInNewTab(): Closure
     {
         return function (string $name, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 
@@ -506,6 +589,8 @@ class TestsActions
     public function assertTableActionShouldNotOpenUrlInNewTab(): Closure
     {
         return function (string $name, $record = null): static {
+            $name = $this->parseActionName($name);
+
             /** @phpstan-ignore-next-line */
             $this->assertTableActionExists($name);
 

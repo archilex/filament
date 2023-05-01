@@ -1,17 +1,43 @@
 @php
     $isDisabled = $isDisabled();
+    $state = $getState();
 @endphp
 
 <div
     x-data="{
         error: undefined,
-        state: @js($getState()),
+        state: @js($state ?? ''),
         isLoading: false,
     }"
+    x-init="
+        Livewire.hook('message.processed', (component) => {
+            if (component.component.id !== @js($this->id)) {
+                return
+            }
+
+            if (! $refs.newState) {
+                return
+            }
+
+            let newState = $refs.newState.value
+
+            if (state === newState) {
+                return
+            }
+
+            state = newState
+        })
+    "
     {{ $attributes->merge($getExtraAttributes())->class([
         'filament-tables-select-column',
     ]) }}
 >
+    <input
+        type="hidden"
+        value="{{ str($state)->replace('"', '\\"') }}"
+        x-ref="newState"
+    />
+
     <select
         x-model="state"
         x-on:change="
@@ -28,7 +54,7 @@
         @endif
         x-tooltip="error"
         {{ $attributes->merge($getExtraInputAttributes())->merge($getExtraAttributes())->class([
-            'ml-0.5 text-gray-900 inline-block transition duration-75 rounded-lg shadow-sm focus:ring-primary-500 focus:ring-1 focus:ring-inset focus:border-primary-500 disabled:opacity-70',
+            'ml-0.5 text-gray-900 inline-block transition duration-75 rounded-lg shadow-sm outline-none focus:ring-primary-500 focus:ring-1 focus:ring-inset focus:border-primary-500 disabled:opacity-70',
             'dark:bg-gray-700 dark:text-white dark:focus:border-primary-500' => config('forms.dark_mode'),
         ]) }}
         x-bind:class="{
